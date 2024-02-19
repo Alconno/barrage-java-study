@@ -3,4 +3,5 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
     <include file="classpath:liquibase/changelog/00000000000000_initial_schema.xml"/>
     <include file="classpath:liquibase/changelog/00000000000001_event_schedule_table.xml"/>
+    <include file="classpath:liquibase/changelog/00000000000002_payment_record_table.xml"/>
 </databaseChangeLog>

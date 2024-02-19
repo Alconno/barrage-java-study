@@ -46,7 +46,7 @@ public class TicketOrderController {
         log.info("Request create ticket order");
         EventSchedule existingEventSchedule = eventScheduleService.getById(id);
         try {
-            TicketOrder savedTicketOrder = ticketOrderService.save(ticketOrder, existingEventSchedule.getId());
+            TicketOrder savedTicketOrder = ticketOrderService.save(ticketOrder, existingEventSchedule);
             return ResponseEntity.ok(savedTicketOrder);
         } catch (RuntimeException e) {
             log.error("Failed to save ticket order. Reason: {}", extractExceptionMessage(e));

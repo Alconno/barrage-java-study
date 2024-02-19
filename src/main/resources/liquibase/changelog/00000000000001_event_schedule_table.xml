@@ -21,7 +21,9 @@
                 firstname         varchar(255)   not null,
                 lastname          varchar(255)   not null,
                 email             varchar(255)   not null,
-                amount            int            not null
+                amount            int            not null,
+                price             decimal(10, 2) not null,
+                status            varchar(255)   not null DEFAULT 'BOOKED'
             );
         </sql>
         <addForeignKeyConstraint baseTableName="event_schedules" baseColumnNames="event_id" constraintName="fk_event_id"

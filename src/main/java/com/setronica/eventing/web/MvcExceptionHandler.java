@@ -2,8 +2,8 @@ package com.setronica.eventing.web;
 
 import com.setronica.eventing.dto.ApplicationExceptionDto;
 import com.setronica.eventing.exceptions.ApplicationLogicException;
-import com.setronica.eventing.exceptions.EventScheduleAlreadyExists;
 import com.setronica.eventing.exceptions.NotFoundException;
+import com.setronica.eventing.exceptions.OrderInProcess;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -26,9 +26,9 @@ public class MvcExceptionHandler {
         return new ResponseEntity<>(exceptionDto, HttpStatusCode.valueOf(404));
     }
 
-    @ExceptionHandler({EventScheduleAlreadyExists.class})
-    public ResponseEntity<ApplicationExceptionDto> handleEventScheduleAlreadyExists(EventScheduleAlreadyExists ex) {
-        log.error("Bad Request");
+    @ExceptionHandler({OrderInProcess.class})
+    public ResponseEntity<ApplicationExceptionDto> handleOrderCurrentlyBooked(OrderInProcess ex) {
+        log.error("Can't modify already processed order");
         ApplicationExceptionDto exceptionDto = new ApplicationExceptionDto(ex.getMessage());
         return new ResponseEntity<>(exceptionDto, HttpStatusCode.valueOf(400));
     }
