@@ -37,21 +37,34 @@
             DECLARE
                 total_booked_seats INT;
             BEGIN
-                SELECT SUM(amount) + NEW.amount INTO total_booked_seats
+                -- Calculate the total booked seats excluding the current ticket order being updated
+                SELECT GREATEST(SUM(amount), 0) INTO total_booked_seats
                 FROM ticket_orders
                 WHERE event_schedule_id = NEW.event_schedule_id;
 
+                -- Subtract the old amount if this is an update operation
+                IF TG_OP = 'UPDATE' THEN
+                    total_booked_seats := total_booked_seats - OLD.amount;
+                END IF;
+
+                -- Add the new amount
+                total_booked_seats := total_booked_seats + NEW.amount;
+
+                -- Raise an exception if the total booked seats exceed the available seats
                 IF total_booked_seats > (SELECT available_seats FROM event_schedules WHERE id = NEW.event_schedule_id) THEN
                     RAISE EXCEPTION 'Event offer exceeded';
                 END IF;
+
+                -- If the constraint is satisfied, allow the insertion or update
                 RETURN NEW;
             END;
             $$ LANGUAGE plpgsql;
 
             CREATE TRIGGER check_available_seats_trigger
-            BEFORE INSERT ON ticket_orders
+            BEFORE INSERT OR UPDATE ON ticket_orders
             FOR EACH ROW
             EXECUTE FUNCTION check_available_seats();
+
             ]]>
         </createProcedure>
     </changeSet>
