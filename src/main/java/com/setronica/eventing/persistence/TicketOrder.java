@@ -34,4 +34,16 @@ public class TicketOrder {
 
     @Column(nullable = false)
     private Integer amount;
+
+    @Column(nullable = false)
+    private BigDecimal price;
+
+    @Column
+    @Enumerated(EnumType.STRING)
+    @ColumnDefault("'BOOKED'")
+    private TicketStatus status;
+
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "id")
+    private PaymentRecord paymentRecord;
 }

@@ -2,13 +2,16 @@ package com.setronica.eventing.app;
 
 import com.setronica.eventing.dto.TicketOrderUpdate;
 import com.setronica.eventing.exceptions.NotFoundException;
+import com.setronica.eventing.persistence.EventSchedule;
 import com.setronica.eventing.persistence.TicketOrder;
 import com.setronica.eventing.persistence.TicketOrderRepository;
+import com.setronica.eventing.persistence.TicketStatus;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -30,10 +33,13 @@ public class TicketOrderService {
         return ticketOrderRepository.findById(id).orElseThrow(() -> new NotFoundException("Ticket order not found with id=" + id));
     }
 
-    public TicketOrder save(TicketOrder ticketOrder, int id) {
+    public TicketOrder save(TicketOrder ticketOrder, EventSchedule existingEventSchedule) {
         log.info("Saving ticket order");
-        ticketOrder.setEventScheduleId(id);
+
         try {
+            ticketOrder.setEventScheduleId(existingEventSchedule.getId());
+            ticketOrder.setPrice(existingEventSchedule.getPrice().multiply(BigDecimal.valueOf(ticketOrder.getAmount())));
+            ticketOrder.setStatus(TicketStatus.BOOKED);
             return ticketOrderRepository.save(ticketOrder);
         } catch (DataIntegrityViolationException e) {
             throw new RuntimeException("Failed to save ticket order due to data integrity violation. Reason: " + e.getMessage(), e);

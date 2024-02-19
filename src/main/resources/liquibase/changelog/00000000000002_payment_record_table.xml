@@ -1,0 +1,20 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+    <changeSet id="20240214-1" author="alex.glebov">
+
+        <!--Table definition -->
+        <sql>
+            create table payment_records
+            (
+                id    int primary key,
+                total decimal(10, 2) not null
+            );
+        </sql>
+        <addForeignKeyConstraint baseTableName="payment_records" baseColumnNames="id"
+                                 constraintName="fk_ticket_order_id"
+                                 referencedTableName="ticket_orders" referencedColumnNames="id" onDelete="CASCADE"
+                                 onUpdate="RESTRICT"/>
+    </changeSet>
+</databaseChangeLog>

@@ -1,7 +1,6 @@
 package com.setronica.eventing.app;
 
 import com.setronica.eventing.dto.EventScheduleUpdate;
-import com.setronica.eventing.exceptions.EventScheduleAlreadyExists;
 import com.setronica.eventing.exceptions.NotFoundException;
 import com.setronica.eventing.persistence.Event;
 import com.setronica.eventing.persistence.EventSchedule;
@@ -32,13 +31,9 @@ public class EventScheduleService {
 
     public EventSchedule save(EventSchedule eventSchedule, Event existingEvent) {
         log.info("Creating event schedule");
-        List<EventSchedule> existingEventSchedules = eventScheduleRepository.findByEventId(existingEvent.getId());
-        if (existingEventSchedules.isEmpty()) {
-            eventSchedule.setEventId(existingEvent.getId());
-            eventSchedule.setEventDate(existingEvent.getDate());
-            return eventScheduleRepository.save(eventSchedule);
-        }
-        throw new EventScheduleAlreadyExists("Event schedule for this event already exists");
+        eventSchedule.setEventDate(existingEvent.getDate());
+        eventSchedule.setEventId(existingEvent.getId());
+        return eventScheduleRepository.save(eventSchedule);
     }
 
     public EventSchedule update(EventSchedule existingEventSchedule, EventScheduleUpdate eventScheduleUpdate) {
