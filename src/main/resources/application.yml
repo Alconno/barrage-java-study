@@ -6,6 +6,21 @@ spring:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5433/postgres
     username: postgres
-    password: pass
+    password: postgres
   jpa:
     show-sql: true
+  rabbitmq:
+    host: 127.0.0.1
+    username: rabbit
+    password: qwesda
+    listener:
+      simple:
+        retry:
+          enabled: true
+          max-attempts: 2
+
+springdoc:
+  api-docs:
+    path: /service/api-docs
+  swagger-ui:
+    path: /service/swagger-ui.html

@@ -15,6 +15,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+
 @RestController
 @RequestMapping("event/api/v1/events/event_schedules")
 public class TicketOrderController {
@@ -27,12 +30,14 @@ public class TicketOrderController {
         this.eventScheduleService = eventScheduleService;
     }
 
+    @Operation(summary = "Get all ticket orders")
     @GetMapping("ticket_orders")
     public List<TicketOrder> getAll() {
         log.info("Request all ticket orders");
         return ticketOrderService.getAll();
     }
 
+    @Operation(summary = "Get ticket order by ID")
     @GetMapping("ticket_orders/{id}")
     public TicketOrder getById(
             @PathVariable Integer id
@@ -41,6 +46,9 @@ public class TicketOrderController {
         return ticketOrderService.getById(id);
     }
 
+    @Operation(summary = "Create a new ticket order")
+    @ApiResponse(responseCode = "200", description = "Ticket order created successfully")
+    @ApiResponse(responseCode = "400", description = "Bad request")
     @PostMapping("{id}/ticket_orders")
     public ResponseEntity<?> create(@PathVariable Integer id, @Valid @RequestBody TicketOrder ticketOrder) {
         log.info("Request create ticket order");
@@ -56,6 +64,10 @@ public class TicketOrderController {
         }
     }
 
+    @Operation(summary = "Update a ticket order")
+    @ApiResponse(responseCode = "200", description = "Ticket order updated successfully")
+    @ApiResponse(responseCode = "404", description = "Ticket order not found")
+    @ApiResponse(responseCode = "500", description = "Internal server error")
     @PutMapping("ticket_orders/{id}")
     public ResponseEntity<?> update(@PathVariable Integer id, @RequestBody TicketOrderUpdate ticketOrderUpdate) {
         log.info("Request update ticket order with id {}", id);
@@ -76,7 +88,23 @@ public class TicketOrderController {
         }
     }
 
-
+    @Operation(summary = "Delete a ticket order")
+    @ApiResponse(responseCode = "200", description = "Ticket order deleted successfully")
+    @ApiResponse(responseCode = "404", description = "Ticket order not found")
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+    @DeleteMapping("ticket_orders/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Integer id) {
+        try {
+            ticketOrderService.delete(id);
+            return ResponseEntity.ok().build();
+        } catch (NotFoundException e) {
+            log.error("Failed to delete ticket order with id {}. Reason: {}", id, e.getMessage());
+            return ResponseEntity.notFound().build();
+        } catch (RuntimeException e) {
+            log.error("Failed to delete ticket order with id {}. Reason: {}", id, e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 
     private String extractExceptionMessage(Exception e) {
         String errorMessage = e.getMessage();
@@ -86,13 +114,5 @@ public class TicketOrderController {
         } else {
             return errorMessage;
         }
-    }
-
-
-
-    @DeleteMapping("ticket_orders/{id}")
-    public void delete(@PathVariable Integer id) {
-        TicketOrder existingTicketOrder = ticketOrderService.getById(id);
-        ticketOrderService.delete(existingTicketOrder.getId());
     }
 }
